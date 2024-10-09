@@ -11,6 +11,24 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['RESULT_FOLDER'] = 'static/watermark'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg','png'}
 
+# หน้าหลัก (Home page)
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# หน้าลายน้ำ (Watermark page)
+@app.route('/watermark')
+def embedding():
+    return render_template('embedding.html')
+
+# # หน้าติดต่อเรา (Contact page)
+# @app.route('/contact')
+# def contact():
+#     return render_template('contact.html')
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
 # สร้างโฟลเดอร์ถ้ายังไม่มี
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['RESULT_FOLDER'], exist_ok=True)
