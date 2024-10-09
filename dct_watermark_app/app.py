@@ -7,8 +7,8 @@ import io
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'dct_watermark_app/static/uploads'
-app.config['RESULT_FOLDER'] = 'dct_watermark_app/static/watermark'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['RESULT_FOLDER'] = 'static/watermark'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg','png'}
 
 # หน้าหลัก (Home page)
