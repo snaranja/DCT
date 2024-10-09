@@ -7,8 +7,8 @@ import io
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['RESULT_FOLDER'] = 'static/watermark'
+app.config['UPLOAD_FOLDER'] = 'dct_watermark_app/static/uploads'
+app.config['RESULT_FOLDER'] = 'dct_watermark_app/static/watermark'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg','png'}
 
 # หน้าหลัก (Home page)
@@ -17,17 +17,17 @@ def home():
     return render_template('index.html')
 
 # หน้าลายน้ำ (Watermark page)
-@app.route('/watermark')
-def embedding():
-    return render_template('embedding.html')
+# @app.route('/watermark', methods=['GET', 'POST'])
+# def embedding():
+#     return render_template('embedding.html')
 
 # # หน้าติดต่อเรา (Contact page)
 # @app.route('/contact')
 # def contact():
 #     return render_template('contact.html')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 # สร้างโฟลเดอร์ถ้ายังไม่มี
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -111,8 +111,13 @@ def embed_watermark(original_image_path, watermark_image_path, output_path, wate
     cv2.imwrite(output_path, watermarked)
 
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+
+@app.route('/watermark', methods=['GET', 'POST'])
+def embedding():
+#     return render_template('embedding.html')
+
+# @app.route('/wassap', methods=['GET', 'POST'])
+# def index():
     if request.method == 'POST':
         if 'original_image' not in request.files or 'watermark_image' not in request.files:
             return redirect(request.url)
@@ -137,9 +142,9 @@ def index():
             # ฝังลายน้ำพร้อมกับความเข้มที่ผู้ใช้ระบุ
             embed_watermark(original_path, watermark_path, result_path, watermark_strength=strength)  # ส่งค่า strength ที่อ่านได้
 
-            return render_template('index.html', result_image=result_filename)
+            return render_template('embedding.html', result_image=result_filename)
 
-    return render_template('index.html', result_image=None)
+    return render_template('embedding.html', result_image=None)
 
 @app.route('/watermark/<filename>')
 def send_watermarked_file(filename):
