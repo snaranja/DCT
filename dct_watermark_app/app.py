@@ -9,25 +9,12 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['RESULT_FOLDER'] = 'static/watermark'
-app.config['ALLOWED_EXTENSIONS'] = {'jpg','png'}
+app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'png'}
 
 # หน้าหลัก (Home page)
 @app.route('/')
 def home():
     return render_template('index.html')
-
-# หน้าลายน้ำ (Watermark page)
-# @app.route('/watermark', methods=['GET', 'POST'])
-# def embedding():
-#     return render_template('embedding.html')
-
-# # หน้าติดต่อเรา (Contact page)
-# @app.route('/contact')
-# def contact():
-#     return render_template('contact.html')
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
 
 # สร้างโฟลเดอร์ถ้ายังไม่มี
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -110,21 +97,67 @@ def embed_watermark(original_image_path, watermark_image_path, output_path, wate
     # บันทึกภาพที่ถูกฝังลายน้ำ
     cv2.imwrite(output_path, watermarked)
 
+def remove_watermark(watermarked_image_path, watermark_image_path, output_path, strength=10):  # รับค่า strength
+    watermarked = cv2.imread(watermarked_image_path)
+    watermark = cv2.imread(watermark_image_path)
+
+    if watermarked.shape[:2] != watermark.shape[:2]:
+        watermark = cv2.resize(watermark, (watermarked.shape[1], watermarked.shape[0]))
+
+    height, width, channels = watermarked.shape
+    block_size = 8
+    restored = np.zeros_like(watermarked)
+
+    for i in range(0, height, block_size):
+        for j in range(0, width, block_size):
+            watermarked_block = watermarked[i:i+block_size, j:j+block_size]
+            watermark_block = watermark[i:i+block_size, j:j+block_size]
+
+            if watermarked_block.shape[0] != block_size or watermarked_block.shape[1] != block_size:
+                continue
+
+            # ตรวจสอบว่าภาพเป็น RGB (3 ช่องสี) หรือขาวดำ (1 ช่องสี)
+            if channels == 3:
+                # กรณีภาพสี (RGB)
+                for channel in range(3):
+                    dct_watermarked = dct2(watermarked_block[:, :, channel])
+                    dct_watermark = dct2(watermark_block[:, :, channel])
+
+                    # ปรับใช้ strength ในการหักลบลายน้ำ
+                    dct_watermarked[1][1] -= strength * dct_watermark[1][1]
+
+                    # ทำ inverse DCT สำหรับแต่ละช่องสี
+                    idct_block = idct2(dct_watermarked)
+                    idct_block = np.clip(idct_block, 0, 255)
+                    restored[i:i+block_size, j:j+block_size, channel] = idct_block
+
+            else:
+                # กรณีภาพขาวดำ (Grayscale)
+                dct_watermarked = dct2(watermarked_block)
+                dct_watermark = dct2(watermark_block)
+
+                # ปรับใช้ strength ในการหักลบลายน้ำ
+                dct_watermarked[1][1] -= strength * dct_watermark[1][1]
+
+                # ทำ inverse DCT สำหรับภาพขาวดำ
+                idct_block = idct2(dct_watermarked)
+                idct_block = np.clip(idct_block, 0, 255)
+                restored[i:i+block_size, j+j+block_size] = idct_block
+
+    cv2.imwrite(output_path, restored)
+
+
 
 
 @app.route('/watermark', methods=['GET', 'POST'])
 def embedding():
-#     return render_template('embedding.html')
-
-# @app.route('/wassap', methods=['GET', 'POST'])
-# def index():
     if request.method == 'POST':
         if 'original_image' not in request.files or 'watermark_image' not in request.files:
             return redirect(request.url)
 
         original_file = request.files['original_image']
         watermark_file = request.files['watermark_image']
-        strength = float(request.form['strength'])  # อ่านค่าความเข้มจากฟอร์ม (เพิ่มบรรทัดนี้)
+        strength = float(request.form['strength'])
 
         if original_file and allowed_file(original_file.filename) and watermark_file and allowed_file(watermark_file.filename):
             original_filename = secure_filename(original_file.filename)
@@ -140,11 +173,42 @@ def embedding():
             result_path = os.path.join(app.config['RESULT_FOLDER'], result_filename)
 
             # ฝังลายน้ำพร้อมกับความเข้มที่ผู้ใช้ระบุ
-            embed_watermark(original_path, watermark_path, result_path, watermark_strength=strength)  # ส่งค่า strength ที่อ่านได้
+            embed_watermark(original_path, watermark_path, result_path, watermark_strength=strength)
 
             return render_template('embedding.html', result_image=result_filename)
 
     return render_template('embedding.html', result_image=None)
+
+@app.route('/remove', methods=['GET', 'POST'])
+def removing():
+    if request.method == 'POST':
+        if 'watermarked_image' not in request.files or 'watermark_image' not in request.files:
+            return redirect(request.url)
+
+        watermarked_file = request.files['watermarked_image']
+        watermark_file = request.files['watermark_image']
+        strength = float(request.form['strength'])  # รับค่า strength จากฟอร์ม
+
+        if watermarked_file and allowed_file(watermarked_file.filename) and watermark_file and allowed_file(watermark_file.filename):
+            watermarked_filename = secure_filename(watermarked_file.filename)
+            watermark_filename = secure_filename(watermark_file.filename)
+
+            watermarked_path = os.path.join(app.config['UPLOAD_FOLDER'], watermarked_filename)
+            watermark_path = os.path.join(app.config['UPLOAD_FOLDER'], watermark_filename)
+
+            watermarked_file.save(watermarked_path)
+            watermark_file.save(watermark_path)
+
+            result_filename = 'restored_' + watermarked_filename
+            result_path = os.path.join(app.config['RESULT_FOLDER'], result_filename)
+
+            # ลบลายน้ำโดยใช้ strength ที่ผู้ใช้ระบุ
+            remove_watermark(watermarked_path, watermark_path, result_path, strength)
+
+            return render_template('remove.html', result_image=result_filename)
+
+    return render_template('remove.html', result_image=None)
+
 
 @app.route('/watermark/<filename>')
 def send_watermarked_file(filename):

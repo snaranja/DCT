@@ -6,7 +6,7 @@
 body{
     width: 100vw;
     height: 100vh;
-    background-image: url("/static/img/backg3.jpg");
+    background-image: url("/static/img/backg4.jpg");
     background-size: cover;
 }
 ul {
@@ -44,15 +44,13 @@ li {
 header {
     width: 100vw;
     height: 100vh;
-    background-image: url("/static/img/backg3.jpg");
-    background-size: cover;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     
 }
 .header-content{
-    margin-bottom: 150px;
+    margin-bottom: 100px;
     color: whitesmoke;
     text-align: center;
 }
@@ -68,7 +66,7 @@ header {
 }
 .header-content h1{
     font-size: 10vmin;
-    margin-top: 50px;
+    margin-top: 20px;
     margin-bottom: 30px;
 }
 .ctn {
@@ -80,3 +78,176 @@ header {
 ul {
     list-style: none;
 }
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 40px 0;
+}
+.container .card {
+    position: relative;
+    min-width: 320px;
+    height: 440px;
+    box-shadow: inset 5px 5px 5px rgba(0,0,0, .2),
+                inset -5px -5px 15px rgba(255,255,255, .1),
+                5px 5px 15px rgba(0,0,0, .3),
+                -5px -5px 15px rgba(255,255,255, .1);
+    border-radius: 15px;
+    margin: 30px;
+}
+
+.container .card .box {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    background: #2a2b2f;
+    border: 2px solid #1e1f23;
+    border-radius: 15px;
+    box-shadow: 0 20px 50px rgba(0,0,0, .5);
+    transition: 0.5s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.container .card .box::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background:  rgba(255,255,255, .05);
+    pointer-events: none;
+}
+
+.container .card .box:hover{
+    transform: translateY(-50px);
+    box-shadow: 0 40px 70px rgba(0,0,0, .5);
+}
+.container .card .box .content{
+    padding: 20px;
+    text-align: center;
+}
+
+.container .card .box .content h2{
+    position: absolute;
+    top: -10px;
+    right: 30px;
+    font-size: 8em;
+    color: rgba(255,255,255, .05);
+}
+.container .card .box .content h3{
+    font-size: 1.8em;
+    color: rgba(255,255,255, .5);
+    z-index: 1;
+    transition: 0.5s;
+}
+.container .card .box .content p{
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(255,255,255, .5);
+    z-index: 1;
+    transition: 0.5s;
+}
+.container .card .box .content a{
+    position: relative;
+    display: inline-block;
+    padding: 8px 20px;
+    background: #000;
+    margin-top: 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 400;
+    color: #fff;
+    box-sizing: 0 10px 20px rgba(0,0,0, .2);
+}
+.container .card:nth-child(1) .box .content a{
+    background: #2196f3;
+}
+.container .card:nth-child(4) .box .content a{
+    background: #e91e63;
+}
+.container .card:nth-child(3) .box .content a{
+    background: #97dc47;
+}
+span{
+    color: whitesmoke;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+.pic {
+    display: block; /* ทำให้ภาพเป็น block เพื่อให้ margin ทำงาน */
+    margin-left: auto; /* จัดให้อยู่กึ่งกลางทางแนวนอน */
+    margin-right: auto; /* จัดให้อยู่กึ่งกลางทางแนวนอน */
+    max-width: 200px; /* ปรับขนาดความกว้างสูงสุด */
+    height: auto; /* ให้ภาพรักษาสัดส่วน */
+    margin-top: 20px; /* เพิ่ม margin ด้านบน */
+}
+
+.card-04 {
+    background-color: black; /* พื้นหลังสีดำ */
+    color: white; /* ข้อความสีขาว */
+    padding: 20px; /* เพิ่มระยะห่างระหว่างขอบ */
+    margin-top: 20px; /* เพิ่มระยะห่างจากการ์ดก่อนหน้า */
+    border-radius: 10px; /* ขอบมน */
+    width: 120%; /* ขยายให้กว้างกว่าการ์ดอื่น */
+}
+
+.card-04 .content {
+    text-align: center;
+}
+
+/* ทำให้ card-04 มีเงาเพื่อแยกกับการ์ดอื่น */
+.card-04 {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* .container-1{
+    width: 100%;
+    max-width: 250px;
+    background: #fff;
+    border-radius: 7px;
+    padding: 25px;
+}
+header h3 {
+    font-size: 2rem;
+    color: darkblue;
+    text-transform: capitalize;
+    text-align: center;
+    margin-bottom: 15px;
+    background: linear-gradient(145deg, #06beb6, #8448bf, #48b1bf);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+main .media {
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+main .media.dashed{
+    border: 2px dashed #06beb6;
+} */
+
+.a1{
+    background: rgba(135, 135, 135, .6);
+    padding: 30px;
+    border-radius: 30px;
+    width: 350px;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    margin-top: 20px;
+}
+
